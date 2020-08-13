@@ -149,7 +149,12 @@
     <ClCompile Include="..\..\src\main\eventloop.c" />
     <ClCompile Include="..\..\src\main\lirc.c" />
     <ClCompile Include="..\..\src\main\main.c" />
-    <ClCompile Include="..\..\src\main\netplay.c" />
+    <ClCompile Include="..\..\src\main\netplay.c">
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">true</ExcludedFromBuild>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|x64'">true</ExcludedFromBuild>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">true</ExcludedFromBuild>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">true</ExcludedFromBuild>
+    </ClCompile>
     <ClCompile Include="..\..\src\main\rom.c" />
     <ClCompile Include="..\..\src\main\savestates.c" />
     <ClCompile Include="..\..\src\main\screenshot.c" />
@@ -188,7 +193,12 @@
     </ClCompile>
     <ClCompile Include="..\..\src\osal\files_win32.c" />
     <ClCompile Include="..\..\src\osd\oglft_c.cpp" />
-    <ClCompile Include="..\..\src\osd\osd.c" />
+    <ClCompile Include="..\..\src\osd\osd.c">
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">true</ExcludedFromBuild>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">true</ExcludedFromBuild>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|x64'">true</ExcludedFromBuild>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">true</ExcludedFromBuild>
+    </ClCompile>
     <ClCompile Include="..\..\src\device\rcp\pi\pi_controller.c" />
     <ClCompile Include="..\..\src\plugin\dummy_audio.c" />
     <ClCompile Include="..\..\src\plugin\dummy_input.c" />
@@ -932,16 +942,17 @@
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
     <ClCompile>
       <Optimization>Disabled</Optimization>
-      <AdditionalIncludeDirectories>..\..\src;..\..\subprojects\md5;..\..\subprojects\minizip;..\..\subprojects\oglft;..\..\subprojects\xxhash;..\..\..\mupen64plus-win32-deps\SDL2-2.0.10\include;..\..\..\mupen64plus-win32-deps\SDL2_net-2.0.1\include;..\..\..\mupen64plus-win32-deps\zlib-1.2.11\include;..\..\..\mupen64plus-win32-deps\libpng-1.6.37\include;..\..\..\mupen64plus-win32-deps\freetype-2.10.1\include;..\..\..\mupen64plus-win32-deps\opencv-3.0.0\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
-      <PreprocessorDefinitions>WIN32;_DEBUG;_WINDOWS;_USRDLL;_CRT_SECURE_NO_DEPRECATE;DYNAREC;M64P_OSD;M64P_NETPLAY;M64P_PARALLEL;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <AdditionalIncludeDirectories>..\..\src;..\..\subprojects\md5;..\..\subprojects\minizip;..\..\subprojects\oglft;..\..\subprojects\xxhash;$(vcpkg_x86)\include\SDL2;$(vcpkg_x86)\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <PreprocessorDefinitions>WIN32;_DEBUG;_WINDOWS;_USRDLL;_CRT_SECURE_NO_DEPRECATE;DYNAREC;M64P_PARALLEL;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <BasicRuntimeChecks>EnableFastChecks</BasicRuntimeChecks>
       <RuntimeLibrary>MultiThreadedDebugDLL</RuntimeLibrary>
       <WarningLevel>Level3</WarningLevel>
     </ClCompile>
     <Link>
-      <AdditionalDependencies>shell32.lib;opengl32.lib;glu32.lib;..\..\..\mupen64plus-win32-deps\SDL2-2.0.10\lib\x86\SDL2.lib;..\..\..\mupen64plus-win32-deps\SDL2_net-2.0.1\lib\x86\SDL2_net.lib;..\..\..\mupen64plus-win32-deps\zlib-1.2.11\lib\x86\zlib.lib;..\..\..\mupen64plus-win32-deps\libpng-1.6.37\lib\x86\libpng16.lib;..\..\..\mupen64plus-win32-deps\freetype-2.10.1\lib\x86\freetype.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalDependencies>shell32.lib;opengl32.lib;glu32.lib;SDL2d.lib;zlibd.lib;libpng16d.lib;freetyped.lib;%(AdditionalDependencies)</AdditionalDependencies>
       <GenerateDebugInformation>true</GenerateDebugInformation>
       <SubSystem>Windows</SubSystem>
+      <AdditionalLibraryDirectories>$(vcpkg_x86)\debug\lib;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
     </Link>
     <PreBuildEvent>
       <Command>..\..\tools\gen_asm_script.cmd $(IntDir)</Command>
@@ -950,16 +961,17 @@
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
     <ClCompile>
       <Optimization>Disabled</Optimization>
-      <AdditionalIncludeDirectories>..\..\src;..\..\subprojects\md5;..\..\subprojects\minizip;..\..\subprojects\oglft;..\..\subprojects\xxhash;..\..\..\mupen64plus-win32-deps\SDL2-2.0.10\include;..\..\..\mupen64plus-win32-deps\SDL2_net-2.0.1\include;..\..\..\mupen64plus-win32-deps\zlib-1.2.11\include;..\..\..\mupen64plus-win32-deps\libpng-1.6.37\include;..\..\..\mupen64plus-win32-deps\freetype-2.10.1\include;..\..\..\mupen64plus-win32-deps\opencv-3.0.0\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
-      <PreprocessorDefinitions>WIN32;_DEBUG;_WINDOWS;_USRDLL;_CRT_SECURE_NO_DEPRECATE;DYNAREC;M64P_PARALLEL;M64P_OSD;M64P_NETPLAY;__x86_64__;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <AdditionalIncludeDirectories>..\..\src;..\..\subprojects\md5;..\..\subprojects\minizip;..\..\subprojects\oglft;..\..\subprojects\xxhash;$(vcpkg_x64)\include\SDL2;$(vcpkg_x64)\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <PreprocessorDefinitions>WIN32;_DEBUG;_WINDOWS;_USRDLL;_CRT_SECURE_NO_DEPRECATE;DYNAREC;M64P_PARALLEL;__x86_64__;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <BasicRuntimeChecks>EnableFastChecks</BasicRuntimeChecks>
       <RuntimeLibrary>MultiThreadedDebugDLL</RuntimeLibrary>
       <WarningLevel>Level3</WarningLevel>
     </ClCompile>
     <Link>
-      <AdditionalDependencies>shell32.lib;opengl32.lib;glu32.lib;..\..\..\mupen64plus-win32-deps\SDL2-2.0.10\lib\x64\SDL2.lib;..\..\..\mupen64plus-win32-deps\SDL2_net-2.0.1\lib\x64\SDL2_net.lib;..\..\..\mupen64plus-win32-deps\zlib-1.2.11\lib\x64\zlib.lib;..\..\..\mupen64plus-win32-deps\libpng-1.6.37\lib\x64\libpng16.lib;..\..\..\mupen64plus-win32-deps\freetype-2.10.1\lib\x64\freetype.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalDependencies>shell32.lib;opengl32.lib;glu32.lib;SDL2d.lib;zlibd.lib;libpng16d.lib;freetyped.lib;%(AdditionalDependencies)</AdditionalDependencies>
       <GenerateDebugInformation>true</GenerateDebugInformation>
       <SubSystem>Windows</SubSystem>
+      <AdditionalLibraryDirectories>$(vcpkg_x64)\debug\lib;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
     </Link>
     <PreBuildEvent>
       <Command>..\..\tools\gen_asm_script.cmd $(IntDir) /D "__x86_64__"</Command>
@@ -1075,8 +1087,8 @@
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
     <ClCompile>
-      <AdditionalIncludeDirectories>..\..\src;..\..\subprojects\md5;..\..\subprojects\minizip;..\..\subprojects\oglft;..\..\subprojects\xxhash;..\..\..\mupen64plus-win32-deps\SDL2-2.0.10\include;..\..\..\mupen64plus-win32-deps\SDL2_net-2.0.1\include;..\..\..\mupen64plus-win32-deps\zlib-1.2.11\include;..\..\..\mupen64plus-win32-deps\libpng-1.6.37\include;..\..\..\mupen64plus-win32-deps\freetype-2.10.1\include;..\..\..\mupen64plus-win32-deps\opencv-3.0.0\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
-      <PreprocessorDefinitions>WIN32;NDEBUG;_WINDOWS;_USRDLL;_CRT_SECURE_NO_DEPRECATE;DYNAREC;M64P_OSD;M64P_NETPLAY;M64P_PARALLEL;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <AdditionalIncludeDirectories>..\..\src;..\..\subprojects\md5;..\..\subprojects\minizip;..\..\subprojects\oglft;..\..\subprojects\xxhash;$(vcpkg_x86)\include\SDL2;$(vcpkg_x86)\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <PreprocessorDefinitions>WIN32;NDEBUG;_WINDOWS;_USRDLL;_CRT_SECURE_NO_DEPRECATE;DYNAREC;M64P_PARALLEL;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <RuntimeLibrary>MultiThreadedDLL</RuntimeLibrary>
       <WarningLevel>Level3</WarningLevel>
       <Optimization>MaxSpeed</Optimization>
@@ -1084,11 +1096,12 @@
       <IntrinsicFunctions>true</IntrinsicFunctions>
     </ClCompile>
     <Link>
-      <AdditionalDependencies>shell32.lib;opengl32.lib;glu32.lib;..\..\..\mupen64plus-win32-deps\SDL2-2.0.10\lib\x86\SDL2.lib;..\..\..\mupen64plus-win32-deps\SDL2_net-2.0.1\lib\x86\SDL2_net.lib;..\..\..\mupen64plus-win32-deps\zlib-1.2.11\lib\x86\zlib.lib;..\..\..\mupen64plus-win32-deps\libpng-1.6.37\lib\x86\libpng16.lib;..\..\..\mupen64plus-win32-deps\freetype-2.10.1\lib\x86\freetype.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalDependencies>shell32.lib;opengl32.lib;glu32.lib;SDL2.lib;zlib.lib;libpng16.lib;freetype.lib;%(AdditionalDependencies)</AdditionalDependencies>
       <GenerateDebugInformation>true</GenerateDebugInformation>
       <SubSystem>Windows</SubSystem>
       <OptimizeReferences>true</OptimizeReferences>
       <EnableCOMDATFolding>true</EnableCOMDATFolding>
+      <AdditionalLibraryDirectories>$(vcpkg_x86)\lib;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
     </Link>
     <PreBuildEvent>
       <Command>..\..\tools\gen_asm_script.cmd $(IntDir)</Command>
@@ -1096,8 +1109,8 @@
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
     <ClCompile>
-      <AdditionalIncludeDirectories>..\..\src;..\..\subprojects\md5;..\..\subprojects\minizip;..\..\subprojects\oglft;..\..\subprojects\xxhash;..\..\..\mupen64plus-win32-deps\SDL2-2.0.10\include;..\..\..\mupen64plus-win32-deps\SDL2_net-2.0.1\include;..\..\..\mupen64plus-win32-deps\zlib-1.2.11\include;..\..\..\mupen64plus-win32-deps\libpng-1.6.37\include;..\..\..\mupen64plus-win32-deps\freetype-2.10.1\include;..\..\..\mupen64plus-win32-deps\opencv-3.0.0\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
-      <PreprocessorDefinitions>WIN32;NDEBUG;_WINDOWS;_USRDLL;_CRT_SECURE_NO_DEPRECATE;DYNAREC;M64P_PARALLEL;M64P_OSD;M64P_NETPLAY;__x86_64__;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <AdditionalIncludeDirectories>..\..\src;..\..\subprojects\md5;..\..\subprojects\minizip;..\..\subprojects\oglft;..\..\subprojects\xxhash;$(vcpkg_x64)\include\SDL2;$(vcpkg_x64)\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <PreprocessorDefinitions>WIN32;NDEBUG;_WINDOWS;_USRDLL;_CRT_SECURE_NO_DEPRECATE;DYNAREC;M64P_PARALLEL;__x86_64__;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <RuntimeLibrary>MultiThreadedDLL</RuntimeLibrary>
       <WarningLevel>Level3</WarningLevel>
       <Optimization>MaxSpeed</Optimization>
@@ -1105,11 +1118,12 @@
       <IntrinsicFunctions>true</IntrinsicFunctions>
     </ClCompile>
     <Link>
-      <AdditionalDependencies>shell32.lib;opengl32.lib;glu32.lib;..\..\..\mupen64plus-win32-deps\SDL2-2.0.10\lib\x64\SDL2.lib;..\..\..\mupen64plus-win32-deps\SDL2_net-2.0.1\lib\x64\SDL2_net.lib;..\..\..\mupen64plus-win32-deps\zlib-1.2.11\lib\x64\zlib.lib;..\..\..\mupen64plus-win32-deps\libpng-1.6.37\lib\x64\libpng16.lib;..\..\..\mupen64plus-win32-deps\freetype-2.10.1\lib\x64\freetype.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalDependencies>shell32.lib;opengl32.lib;glu32.lib;SDL2.lib;zlib.lib;libpng16.lib;freetype.lib;%(AdditionalDependencies)</AdditionalDependencies>
       <GenerateDebugInformation>true</GenerateDebugInformation>
       <SubSystem>Windows</SubSystem>
       <OptimizeReferences>true</OptimizeReferences>
       <EnableCOMDATFolding>true</EnableCOMDATFolding>
+      <AdditionalLibraryDirectories>$(vcpkg_x64)\lib;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
     </Link>
     <PreBuildEvent>
       <Command>..\..\tools\gen_asm_script.cmd $(IntDir) /D "__x86_64__"</Command>
