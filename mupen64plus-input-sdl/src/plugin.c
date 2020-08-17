@@ -483,10 +483,14 @@ EXPORT void CALL GetKeys( int Control, BUTTONS *Keys )
     SDL_Event event;
     unsigned char mstate;
 
+#if 0
     SDL_PumpEvents();
+#endif
 
     // Handle keyboard input first
+#if 0
     doSdlKeys(SDL_GetKeyboardState(NULL));
+#endif
     doSdlKeys(myKeyState);
 
     for ( b = 0; b < 4; ++b )
@@ -1005,6 +1009,8 @@ EXPORT void CALL RomClosed(void)
 *******************************************************************/
 EXPORT int CALL RomOpen(void)
 {
+    load_configuration(0);
+
     int i;
 
     // open joysticks

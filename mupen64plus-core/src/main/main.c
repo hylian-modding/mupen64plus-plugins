@@ -131,6 +131,108 @@ static void* l_paks[GAME_CONTROLLERS_COUNT][PAK_MAX_SIZE];
 static const struct pak_interface* l_ipaks[PAK_MAX_SIZE];
 static size_t l_pak_type_idx[6];
 
+#include "api/m64p_ext.h"
+
+extern void event_deinitialize(void);
+
+ExtCallback g_frame_cb, g_vi_cb, g_pause_cb;
+ExtIntCallback g_reset_cb, g_event_cb;
+
+EXPORT void CALL ExtSetFrameCallback(ExtCallback cb)
+{
+    g_frame_cb = cb;
+}
+
+EXPORT void CALL ExtSetVICallback(ExtCallback cb)
+{
+    g_vi_cb = cb;
+}
+
+EXPORT void CALL ExtSetResetCallback(ExtIntCallback cb)
+{
+    g_reset_cb = cb;
+}
+
+EXPORT void CALL ExtSetPauseLoopCallback(ExtCallback cb)
+{
+    g_pause_cb = cb;
+}
+
+EXPORT void CALL ExtSetCoreEventCallback(ExtIntCallback cb)
+{
+    g_event_cb = cb;
+}
+
+EXPORT uint8_t* CALL ExtGetDRAMPtr(void)
+{
+    return (uint8_t*)g_dev.r4300.rdram->dram;
+}
+
+EXPORT size_t CALL ExtGetDRAMSize(void)
+{
+    return g_dev.r4300.rdram->dram_size;
+}
+
+EXPORT uint8_t* CALL ExtGetROMPtr(void)
+{
+    return g_dev.cart.cart_rom.rom;
+}
+
+EXPORT size_t CALL ExtGetROMSize(void)
+{
+    return g_dev.cart.cart_rom.rom_size;
+}
+
+EXPORT void CALL ExtInvalidateCachedCode(void)
+{
+#ifdef NEW_DYNAREC
+    invalidate_cached_code_new_dynarec(&g_dev.r4300, 0, 0);
+#else
+    invalidate_r4300_cached_code(&g_dev.r4300, 0, 0);
+#endif
+}
+
+EXPORT void CALL ExtInputKeyDown(int mod, int sym)
+{
+    input.keyDown(mod, sym);
+}
+
+EXPORT void CALL ExtInputKeyUp(int mod, int sym)
+{
+    input.keyUp(mod, sym);
+}
+
+EXPORT void CALL ExtGfxResizeOutput(int w, int h)
+{
+    gfx.resizeVideoOutput(w, h);
+}
+
+EXPORT uint32_t CALL ExtContGetInput(int index)
+{
+    struct game_controller* cont = &g_dev.controllers[index];
+    uint32_t input = 0;
+
+    if (cont->icin->get_input(cont->cin, &input) != M64ERR_SUCCESS)
+        return 0;
+    else
+        return input | cont->input;
+}
+
+EXPORT void CALL ExtContSetInput(int index, uint32_t input)
+{
+    g_dev.controllers[index].input = input;
+}
+
+EXPORT uint32_t CALL ExtContGetPluginFilter(int index)
+{
+    return g_dev.controllers[index].filter;
+}
+
+EXPORT void CALL ExtContSetPluginFilter(int index, uint32_t filter)
+{
+    g_dev.controllers[index].filter = filter;
+}
+
 /*********************************************************************************************************
 * static functions
 */
@@ -746,6 +848,9 @@ int main_volume_get_muted(void)
 
 m64p_error main_reset(int do_hard_reset)
 {
+    if (g_reset_cb)
+        g_reset_cb(do_hard_reset);
+
     if (do_hard_reset) {
         hard_reset_device(&g_dev);
     }
@@ -791,6 +896,9 @@ static void video_plugin_render_callback(int bScreenRedrawn)
 
 void new_frame(void)
 {
+    if (g_frame_cb)
+        g_frame_cb();
+
     if (g_FrameCallback != NULL)
         (*g_FrameCallback)(l_CurrentFrame);
 
@@ -913,8 +1021,13 @@ static void pause_loop(void)
         VidExt_GL_SwapBuffers();
         while(g_rom_pause)
         {
+#if 0
             SDL_Delay(10);
             main_check_inputs();
+#endif
+
+            if (g_pause_cb)
+                g_pause_cb();
         }
     }
 }
@@ -923,6 +1036,9 @@ static void pause_loop(void)
  * Allow the core to perform various things */
 void new_vi(void)
 {
+    if (g_vi_cb)
+        g_vi_cb();
+
 #if defined(PROFILE)
     timed_sections_refresh();
 #endif
@@ -1343,7 +1459,10 @@ m64p_error main_run(void)
         disable_extra_mem = ConfigGetParamInt(g_CoreConfig, "DisableExtraMem");
 
 
+#if 0
     rdram_size = (disable_extra_mem == 0) ? 0x800000 : 0x400000;
+#endif
+    rdram_size = RDRAM_MAX_SIZE;
 
     if (count_per_op <= 0)
         count_per_op = ROM_PARAMS.countperop;
@@ -1677,6 +1796,8 @@ m64p_error main_run(void)
     g_EmulatorRunning = 0;
     StateChanged(M64CORE_EMU_STATE, M64EMU_STOPPED);
 
+    event_deinitialize();
+
     return M64ERR_SUCCESS;
 
 on_input_open_failure:
@@ -1701,6 +1822,8 @@ on_gfx_open_failure:
     close_file_storage(&eep);
     close_file_storage(&mpk);
     close_file_storage(&dd_disk);
+
+    event_deinitialize();
 
     return M64ERR_PLUGIN_FAIL;
 }

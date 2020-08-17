@@ -20,6 +20,22 @@
  *   51 Franklin Street, Fifth Floor, Boston, MA 02110-1301, USA.          *
  * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
 
+#include "api/m64p_ext.h"
+
+extern ExtIntCallback g_event_cb;
+
+void NotifyEvent(enum ExtCoreEvent e)
+{
+    if (g_event_cb)
+        g_event_cb(e);
+}
+
+void NotifyEventWData(enum ExtCoreEvent e, uint8_t data)
+{
+    if (g_event_cb)
+        g_event_cb(e | (data << 8));
+}
+
 #include <SDL.h>
 #include <SDL_syswm.h>
 #include <stdio.h>
@@ -305,10 +321,11 @@ static int SDLCALL event_sdl_filter(void *userdata, SDL_Event *event)
     switch(event->type)
     {
         // user clicked on window close button
+#if 0
         case SDL_QUIT:
             main_stop();
             break;
-
+#endif
         case SDL_KEYDOWN:
 #if SDL_VERSION_ATLEAST(1,3,0)
             if (event->key.repeat)
@@ -327,6 +344,7 @@ static int SDLCALL event_sdl_filter(void *userdata, SDL_Event *event)
 #endif
             return 0;
 
+#if 0
 #if SDL_VERSION_ATLEAST(1,3,0)
         case SDL_WINDOWEVENT:
             switch (event->window.event) {
@@ -359,6 +377,7 @@ static int SDLCALL event_sdl_filter(void *userdata, SDL_Event *event)
             break;
 #endif
 #endif
+#endif
 
         // if joystick action is detected, check if it's mapped to a special function
         case SDL_JOYAXISMOTION:
@@ -371,44 +390,62 @@ static int SDLCALL event_sdl_filter(void *userdata, SDL_Event *event)
                 if (action == 1) /* command was just activated (button down, etc) */
                 {
                     if (cmd == joyFullscreen)
-                        gfx.changeWindow();
+                        // gfx.changeWindow();
+                        NotifyEvent(ExtCoreEvent_ChangeWindow);
                     else if (cmd == joyStop)
-                        main_stop();
+                        // main_stop();
+                        NotifyEvent(ExtCoreEvent_Stop);
                     else if (cmd == joyPause)
-                        main_toggle_pause();
+                        // main_toggle_pause();
+                        NotifyEvent(ExtCoreEvent_TogglePause);
                     else if (cmd == joySave)
-                        main_state_save(1, NULL); /* save in mupen64plus format using current slot */
+                        // main_state_save(1, NULL); /* save in mupen64plus format using current slot */
+                        NotifyEvent(ExtCoreEvent_StateSave);
                     else if (cmd == joyLoad)
-                        main_state_load(NULL); /* load using current slot */
+                        // main_state_load(NULL); /* load using current slot */
+                        NotifyEvent(ExtCoreEvent_StateLoad);
                     else if (cmd == joyIncrement)
-                        main_state_inc_slot();
+                        // main_state_inc_slot();
+                        NotifyEvent(ExtCoreEvent_StateIncSlot);
                     else if (cmd == joyReset)
-                        main_reset(0);
+                        // main_reset(0);
+                        NotifyEvent(ExtCoreEvent_SoftReset);
                     else if (cmd == joySpeedDown)
-                        main_speeddown(5);
+                        // main_speeddown(5);
+                        NotifyEvent(ExtCoreEvent_SpeedDown);
                     else if (cmd == joySpeedUp)
-                        main_speedup(5);
+                        // main_speedup(5);
+                        NotifyEvent(ExtCoreEvent_SpeedUp);
                     else if (cmd == joyScreenshot)
-                        main_take_next_screenshot();
+                        // main_take_next_screenshot();
+                        NotifyEvent(ExtCoreEvent_TakeNextScreenshot);
                     else if (cmd == joyMute)
-                        main_volume_mute();
+                        // main_volume_mute();
+                        NotifyEvent(ExtCoreEvent_VolumeMute);
                     else if (cmd == joyDecrease)
-                        main_volume_down();
+                        // main_volume_down();
+                        NotifyEvent(ExtCoreEvent_VolumeDown);
                     else if (cmd == joyIncrease)
-                        main_volume_up();
+                        // main_volume_up();
+                        NotifyEvent(ExtCoreEvent_VolumeUp);
                     else if (cmd == joyForward)
-                        main_set_fastforward(1);
+                        // main_set_fastforward(1);
+                        NotifyEvent(ExtCoreEvent_SetFastForward);
                     else if (cmd == joyAdvance)
-                        main_advance_one();
+                        // main_advance_one();
+                        NotifyEvent(ExtCoreEvent_AdvanceOne);
                     else if (cmd == joyGameshark)
-                        event_set_gameshark(1);
+                        // event_set_gameshark(1);
+                        NotifyEvent(ExtCoreEvent_SetGameShark);
                 }
                 else if (action == -1) /* command was just de-activated (button up, etc) */
                 {
                     if (cmd == joyForward)
-                        main_set_fastforward(0);
+                        // main_set_fastforward(0);
+                        NotifyEvent(ExtCoreEvent_UnsetFastForward);
                     else if (cmd == joyGameshark)
-                        event_set_gameshark(0);
+                        // event_set_gameshark(0);
+                        NotifyEvent(ExtCoreEvent_UnsetGameShark);
                 }
             }
 
@@ -496,14 +533,22 @@ void event_initialize(void)
 #if !SDL_VERSION_ATLEAST(2,0,0)
     SDL_EnableKeyRepeat(0, 0);
 #endif
+#if 0
     SDL_SetEventFilter(event_sdl_filter, NULL);
-    
+#endif
+    SDL_AddEventWatch(event_sdl_filter, NULL);
+
 #if defined(WIN32) && !SDL_VERSION_ATLEAST(1,3,0)
     SDL_EventState(SDL_SYSWMEVENT, SDL_ENABLE);
 
     if (SDL_EventState(SDL_SYSWMEVENT, SDL_QUERY) != SDL_ENABLE)
         DebugMessage(M64MSG_WARNING, "Failed to change event state: %s", SDL_GetError());
 #endif
+}
+
+void event_deinitialize()
+{
+    SDL_DelEventWatch(event_sdl_filter, NULL);
 }
 
 int event_set_core_defaults(void)
@@ -613,49 +658,68 @@ void event_sdl_keydown(int keysym, int keymod)
 
     /* check for the only 2 hard-coded key commands: Alt-enter for fullscreen and 0-9 for save state slot */
     if (keysym == SDL_SCANCODE_RETURN && keymod & (KMOD_LALT | KMOD_RALT))
-        gfx.changeWindow();
+        // gfx.changeWindow();
+        NotifyEvent(ExtCoreEvent_ChangeWindow);
     else if ((slot = get_saveslot_from_keysym(keysym)) >= 0)
-        main_state_set_slot(slot);
+        // main_state_set_slot(slot);
+        NotifyEventWData(ExtCoreEvent_StateSetSlot, slot);
     /* check all of the configurable commands */
     else if (keysym == sdl_keysym2native(ConfigGetParamInt(l_CoreEventsConfig, kbdStop)))
-        main_stop();
+        // main_stop();
+        NotifyEvent(ExtCoreEvent_Stop);
     else if (keysym == sdl_keysym2native(ConfigGetParamInt(l_CoreEventsConfig, kbdFullscreen)))
-        gfx.changeWindow();
+        // gfx.changeWindow();
+        NotifyEvent(ExtCoreEvent_ChangeWindow);
     else if (keysym == sdl_keysym2native(ConfigGetParamInt(l_CoreEventsConfig, kbdSave)))
-        main_state_save(0, NULL); /* save in mupen64plus format using current slot */
+        // main_state_save(0, NULL); /* save in mupen64plus format using current slot */
+        NotifyEvent(ExtCoreEvent_StateSave);
     else if (keysym == sdl_keysym2native(ConfigGetParamInt(l_CoreEventsConfig, kbdLoad)))
-        main_state_load(NULL); /* load using current slot */
+        // main_state_load(NULL); /* load using current slot */
+        NotifyEvent(ExtCoreEvent_StateLoad);
     else if (keysym == sdl_keysym2native(ConfigGetParamInt(l_CoreEventsConfig, kbdIncrement)))
-        main_state_inc_slot();
+        // main_state_inc_slot();
+        NotifyEvent(ExtCoreEvent_StateIncSlot);
     else if (keysym == sdl_keysym2native(ConfigGetParamInt(l_CoreEventsConfig, kbdReset)))
-        main_reset(0);
+        // main_reset(0);
+        NotifyEvent(ExtCoreEvent_SoftReset);
     else if (keysym == sdl_keysym2native(ConfigGetParamInt(l_CoreEventsConfig, kbdSpeeddown)))
-        main_speeddown(5);
+        // main_speeddown(5);
+        NotifyEvent(ExtCoreEvent_SpeedDown);
     else if (keysym == sdl_keysym2native(ConfigGetParamInt(l_CoreEventsConfig, kbdSpeedup)))
-        main_speedup(5);
+        // main_speedup(5);
+        NotifyEvent(ExtCoreEvent_SpeedUp);
     else if (keysym == sdl_keysym2native(ConfigGetParamInt(l_CoreEventsConfig, kbdScreenshot)))
-        main_take_next_screenshot();    /* screenshot will be taken at the end of frame rendering */
+        // main_take_next_screenshot();    /* screenshot will be taken at the end of frame rendering */
+        NotifyEvent(ExtCoreEvent_TakeNextScreenshot);
     else if (keysym == sdl_keysym2native(ConfigGetParamInt(l_CoreEventsConfig, kbdPause)))
-        main_toggle_pause();
+        // main_toggle_pause();
+        NotifyEvent(ExtCoreEvent_TogglePause);
     else if (keysym == sdl_keysym2native(ConfigGetParamInt(l_CoreEventsConfig, kbdMute)))
-        main_volume_mute();
+        // main_volume_mute();
+        NotifyEvent(ExtCoreEvent_VolumeMute);
     else if (keysym == sdl_keysym2native(ConfigGetParamInt(l_CoreEventsConfig, kbdIncrease)))
-        main_volume_up();
+        // main_volume_up();
+        NotifyEvent(ExtCoreEvent_VolumeUp);
     else if (keysym == sdl_keysym2native(ConfigGetParamInt(l_CoreEventsConfig, kbdDecrease)))
-        main_volume_down();
+        // main_volume_down();
+        NotifyEvent(ExtCoreEvent_VolumeDown);
     else if (keysym == sdl_keysym2native(ConfigGetParamInt(l_CoreEventsConfig, kbdForward)))
-        main_set_fastforward(1);
+        // main_set_fastforward(1);
+        NotifyEvent(ExtCoreEvent_SetFastForward);
     else if (keysym == sdl_keysym2native(ConfigGetParamInt(l_CoreEventsConfig, kbdAdvance)))
-        main_advance_one();
+        // main_advance_one();
+        NotifyEvent(ExtCoreEvent_AdvanceOne);
     else if (keysym == sdl_keysym2native(ConfigGetParamInt(l_CoreEventsConfig, kbdGameshark))) {
-        event_set_gameshark(1);
+        // event_set_gameshark(1);
+        NotifyEvent(ExtCoreEvent_SetGameShark);
     }
+#if 0
     else
     {
         /* pass all other keypresses to the input plugin */
         input.keyDown(keymod, keysym);
     }
-
+#endif
 }
 
 void event_sdl_keyup(int keysym, int keymod)
@@ -666,14 +730,17 @@ void event_sdl_keyup(int keysym, int keymod)
     }
     else if (keysym == sdl_keysym2native(ConfigGetParamInt(l_CoreEventsConfig, kbdForward)))
     {
-        main_set_fastforward(0);
+        // main_set_fastforward(0);
+        NotifyEvent(ExtCoreEvent_UnsetFastForward);
     }
     else if (keysym == sdl_keysym2native(ConfigGetParamInt(l_CoreEventsConfig, kbdGameshark)))
     {
-        event_set_gameshark(0);
+        // event_set_gameshark(0);
+        NotifyEvent(ExtCoreEvent_UnsetGameShark);
     }
+#if 0
     else input.keyUp(keymod, keysym);
-
+#endif
 }
 
 int event_gameshark_active(void)

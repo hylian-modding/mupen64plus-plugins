@@ -250,7 +250,7 @@ static int savestates_load_m64p(struct device* dev, char *filepath)
     curr += 32;
 
     /* Read the rest of the savestate */
-    savestateSize = 16788244;
+    savestateSize = 16788244 + RDRAM_8MB_SIZE;
     savestateData = curr = (unsigned char *)malloc(savestateSize);
     if (savestateData == NULL)
     {
@@ -1517,7 +1517,7 @@ static int savestates_save_m64p(const struct device* dev, char *filepath)
     save_eventqueue_infos(&dev->r4300.cp0, queue);
 
     // Allocate memory for the save state data
-    save->size = 16788288 + sizeof(queue) + 4 + 4096;
+    save->size = 16788288 + sizeof(queue) + 4 + 4096 + RDRAM_8MB_SIZE;
     save->data = curr = malloc(save->size);
     if (save->data == NULL)
     {
