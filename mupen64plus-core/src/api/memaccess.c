@@ -51,7 +51,7 @@ EXPORT void CALL ExtRDRAMWrite8(uint32_t addr, uint8_t val)
 EXPORT void CALL ExtRDRAMWrite16(uint32_t addr, uint16_t val)
 {
 	ExtRDRAMWrite8(addr, val >> 8);
-	ExtRDRAMWrite8(addr, val & 0xff);
+	ExtRDRAMWrite8(addr + 1, val & 0xff);
 }
 
 EXPORT void CALL ExtRDRAMWrite32(uint32_t addr, uint32_t val)
@@ -106,7 +106,7 @@ EXPORT void CALL ExtROMWrite8(uint32_t addr, uint8_t val)
 EXPORT void CALL ExtROMWrite16(uint32_t addr, uint16_t val)
 {
 	ExtROMWrite8(addr, val >> 8);
-	ExtROMWrite8(addr, val & 0xff);
+	ExtROMWrite8(addr + 1, val & 0xff);
 }
 
 EXPORT void CALL ExtROMWrite32(uint32_t addr, uint32_t val)
