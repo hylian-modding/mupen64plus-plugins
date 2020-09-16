@@ -16,6 +16,11 @@ static inline uint32_t RDRAMAddrAlign(uint32_t addr)
 	return (addr & 0xffffff) >> 2;
 }
 
+static inline uint32_t ROMAddrAlign(uint32_t addr)
+{
+	return addr / 4;
+}
+
 EXPORT uint8_t CALL ExtRDRAMRead8(uint32_t addr)
 {
 	const size_t offset = RDRAMAddrAlign(addr) * 4 + (3 - (addr & 3));
@@ -67,7 +72,7 @@ EXPORT void CALL ExtRDRAMWriteBuffer(uint32_t addr, uint8_t* buf, size_t len)
 
 EXPORT uint8_t CALL ExtROMRead8(uint32_t addr)
 {
-	const size_t offset = addr + (3 - (addr & 3));
+	const size_t offset = ROMAddrAlign(addr) * 4 + (3 - (addr & 3));
 	return ((uint8_t*)mem_base_u32(g_mem_base, MM_CART_ROM))[!g_EmulatorRunning ? addr : offset];
 }
 
@@ -78,7 +83,7 @@ EXPORT uint16_t CALL ExtROMRead16(uint32_t addr)
 
 EXPORT uint32_t CALL ExtROMRead32(uint32_t addr)
 {
-	uint32_t val = mem_base_u32(g_mem_base, MM_CART_ROM)[addr];
+	uint32_t val = mem_base_u32(g_mem_base, MM_CART_ROM)[ROMAddrAlign(addr)];
 	return !g_EmulatorRunning ? bswap32(val) : val;
 }
 
@@ -99,7 +104,7 @@ EXPORT uint8_t* CALL ExtROMReadBuffer(uint32_t addr, size_t len)
 
 EXPORT void CALL ExtROMWrite8(uint32_t addr, uint8_t val)
 {
-	const size_t offset = addr + (3 - (addr & 3));
+	const size_t offset = ROMAddrAlign(addr) * 4 + (3 - (addr & 3));
 	((uint8_t*)mem_base_u32(g_mem_base, MM_CART_ROM))[!g_EmulatorRunning ? addr : offset] = val;
 }
 
@@ -111,7 +116,7 @@ EXPORT void CALL ExtROMWrite16(uint32_t addr, uint16_t val)
 
 EXPORT void CALL ExtROMWrite32(uint32_t addr, uint32_t val)
 {
-	mem_base_u32(g_mem_base, MM_CART_ROM)[addr] = !g_EmulatorRunning ? bswap32(val) : val;
+	mem_base_u32(g_mem_base, MM_CART_ROM)[ROMAddrAlign(addr)] = !g_EmulatorRunning ? bswap32(val) : val;
 }
 
 EXPORT void CALL ExtROMWriteBuffer(uint32_t addr, uint8_t* buf, size_t len)
