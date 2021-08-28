@@ -129,7 +129,7 @@
 
 /* Map virtual address to index in mips3 r4k virtually-indexed cache */
 #define	MIPS3_VA_TO_CINDEX(x) \
-		(((intptr_t)(x) & 0xffffff) | MIPS_KSEG0_START) 
+		(((intptr_t)(x) & 0x0fffffff) | MIPS_KSEG0_START)
 
 #ifndef _LOCORE
 #define	MIPS_XSEG_MASK		(0x3fffffffffffffffLL)
@@ -1252,7 +1252,7 @@ do {									\
 /*
  * Define the instruction formats.
  */
- 
+
 #if defined(M64P_BIG_ENDIAN)
     /* Big Endian */
     typedef union {

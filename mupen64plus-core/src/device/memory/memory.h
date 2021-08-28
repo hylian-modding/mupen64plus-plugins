@@ -26,9 +26,10 @@
 #include <stdint.h>
 
 #include "osal/preproc.h"
+#include "api/callbacks.h"
 
-enum { RDRAM_MAX_SIZE = 0x1000000 };
-enum { RDRAM_8MB_SIZE = 0x800000 };
+enum { RDRAM_MAX_SIZE = 0x03E00000 };
+enum { RDRAM_8MB_SIZE = 0x00800000 };
 enum { CART_ROM_MAX_SIZE = 0x4000000 };
 enum { DD_ROM_MAX_SIZE = 0x400000 };
 
@@ -75,6 +76,9 @@ void init_memory(struct memory* mem,
 
 static osal_inline const struct mem_handler* mem_get_handler(const struct memory* mem, uint32_t address)
 {
+    if (address >> 16 > 0x10000) {
+        DebugMessage(M64MSG_ERROR, "mem_get_handler: address OOB!\n");
+    }
     return &mem->handlers[address >> 16];
 }
 

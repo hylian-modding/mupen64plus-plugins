@@ -138,47 +138,47 @@ static inline void dmem_store_u32(struct hle_t* hle, const uint32_t* src, uint16
 /* convenient functions DRAM access */
 static inline uint8_t* dram_u8(struct hle_t* hle, uint32_t address)
 {
-    return u8(hle->dram, address & 0xffffff);
+    return u8(hle->dram, address & 0x0fffffff);
 }
 
 static inline uint16_t* dram_u16(struct hle_t* hle, uint32_t address)
 {
-    return u16(hle->dram, address & 0xffffff);
+    return u16(hle->dram, address & 0x0fffffff);
 }
 
 static inline uint32_t* dram_u32(struct hle_t* hle, uint32_t address)
 {
-    return u32(hle->dram, address & 0xffffff);
+    return u32(hle->dram, address & 0x0fffffff);
 }
 
 static inline void dram_load_u8(struct hle_t* hle, uint8_t* dst, uint32_t address, size_t count)
 {
-    load_u8(dst, hle->dram, address & 0xffffff, count);
+    load_u8(dst, hle->dram, address & 0x0fffffff, count);
 }
 
 static inline void dram_load_u16(struct hle_t* hle, uint16_t* dst, uint32_t address, size_t count)
 {
-    load_u16(dst, hle->dram, address & 0xffffff, count);
+    load_u16(dst, hle->dram, address & 0x0fffffff, count);
 }
 
 static inline void dram_load_u32(struct hle_t* hle, uint32_t* dst, uint32_t address, size_t count)
 {
-    load_u32(dst, hle->dram, address & 0xffffff, count);
+    load_u32(dst, hle->dram, address & 0x0fffffff, count);
 }
 
 static inline void dram_store_u8(struct hle_t* hle, const uint8_t* src, uint32_t address, size_t count)
 {
-    store_u8(hle->dram, address & 0xffffff, src, count);
+    store_u8(hle->dram, address & 0x0fffffff, src, count);
 }
 
 static inline void dram_store_u16(struct hle_t* hle, const uint16_t* src, uint32_t address, size_t count)
 {
-    store_u16(hle->dram, address & 0xffffff, src, count);
+    store_u16(hle->dram, address & 0x0fffffff, src, count);
 }
 
 static inline void dram_store_u32(struct hle_t* hle, const uint32_t* src, uint32_t address, size_t count)
 {
-    store_u32(hle->dram, address & 0xffffff, src, count);
+    store_u32(hle->dram, address & 0x0fffffff, src, count);
 }
 
 #endif

@@ -357,7 +357,6 @@ void r4300_check_interrupt(struct r4300_core* r4300, uint32_t cause_ip, int set_
 
         if (event == NULL)
         {
-            DebugMessage(M64MSG_ERROR, "Failed to allocate node for new interrupt event");
             return;
         }
 
@@ -374,7 +373,6 @@ void r4300_check_interrupt(struct r4300_core* r4300, uint32_t cause_ip, int set_
         {
             event->next = r4300->cp0.q.first;
             r4300->cp0.q.first = event;
-
         }
     }
 }
@@ -419,7 +417,7 @@ void check_int_handler(void* opaque)
 }
 
 /* Special interrupt is a fake interrupt which porpose is
-   to ensure the number of cycles between current cycle 
+   to ensure the number of cycles between current cycle
    and next interrupt will never exceed 2^31 */
 void special_int_handler(void* opaque)
 {

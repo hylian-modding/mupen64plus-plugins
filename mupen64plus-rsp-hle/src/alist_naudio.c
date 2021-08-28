@@ -75,7 +75,7 @@ static void NAUDIO_14(struct hle_t* hle, uint32_t w1, uint32_t w2)
     uint8_t  flags       = (w1 >> 16);
     uint16_t gain        = w1;
     uint8_t  select_main = (w2 >> 24);
-    uint32_t address     = (w2 & 0xffffff);
+    uint32_t address     = (w2 & 0x0fffffff);
 
     uint16_t dmem = (select_main == 0) ? NAUDIO_MAIN : NAUDIO_MAIN2;
 
@@ -128,7 +128,7 @@ static void SETVOL(struct hle_t* hle, uint32_t w1, uint32_t w2)
 static void ENVMIXER(struct hle_t* hle, uint32_t w1, uint32_t w2)
 {
     uint8_t  flags   = (w1 >> 16);
-    uint32_t address = (w2 & 0xffffff);
+    uint32_t address = (w2 & 0x0fffffff);
 
     hle->alist_naudio.vol[1] = w1;
 
@@ -170,7 +170,7 @@ static void LOADBUFF(struct hle_t* hle, uint32_t w1, uint32_t w2)
 {
     uint16_t count   = (w1 >> 12) & 0xfff;
     uint16_t dmem    = (w1 & 0xfff) + NAUDIO_MAIN;
-    uint32_t address = (w2 & 0xffffff);
+    uint32_t address = (w2 & 0x0fffffff);
 
     alist_load(hle, dmem, address, count);
 }
@@ -179,7 +179,7 @@ static void SAVEBUFF(struct hle_t* hle, uint32_t w1, uint32_t w2)
 {
     uint16_t count   = (w1 >> 12) & 0xfff;
     uint16_t dmem    = (w1 & 0xfff) + NAUDIO_MAIN;
-    uint32_t address = (w2 & 0xffffff);
+    uint32_t address = (w2 & 0x0fffffff);
 
     alist_save(hle, dmem, address, count);
 }
@@ -187,7 +187,7 @@ static void SAVEBUFF(struct hle_t* hle, uint32_t w1, uint32_t w2)
 static void LOADADPCM(struct hle_t* hle, uint32_t w1, uint32_t w2)
 {
     uint16_t count   = w1;
-    uint32_t address = (w2 & 0xffffff);
+    uint32_t address = (w2 & 0x0fffffff);
 
     dram_load_u16(hle, (uint16_t*)hle->alist_naudio.table, address, count >> 1);
 }
@@ -203,12 +203,12 @@ static void DMEMMOVE(struct hle_t* hle, uint32_t w1, uint32_t w2)
 
 static void SETLOOP(struct hle_t* hle, uint32_t UNUSED(w1), uint32_t w2)
 {
-    hle->alist_naudio.loop = (w2 & 0xffffff);
+    hle->alist_naudio.loop = (w2 & 0x0fffffff);
 }
 
 static void ADPCM(struct hle_t* hle, uint32_t w1, uint32_t w2)
 {
-    uint32_t address = (w1 & 0xffffff);
+    uint32_t address = (w1 & 0x0fffffff);
     uint8_t  flags   = (w2 >> 28);
     uint16_t count   = (w2 >> 16) & 0xfff;
     uint16_t dmemi   = ((w2 >> 12) & 0xf) + NAUDIO_MAIN;
@@ -229,7 +229,7 @@ static void ADPCM(struct hle_t* hle, uint32_t w1, uint32_t w2)
 
 static void RESAMPLE(struct hle_t* hle, uint32_t w1, uint32_t w2)
 {
-    uint32_t address = (w1 & 0xffffff);
+    uint32_t address = (w1 & 0x0fffffff);
     uint8_t  flags   = (w2 >> 30);
     uint16_t pitch   = (w2 >> 14);
     uint16_t dmemi   = ((w2 >> 2) & 0xfff) + NAUDIO_MAIN;
@@ -258,7 +258,7 @@ static void MP3ADDY(struct hle_t* UNUSED(hle), uint32_t UNUSED(w1), uint32_t UNU
 static void MP3(struct hle_t* hle, uint32_t w1, uint32_t w2)
 {
     unsigned index = (w1 & 0x1e);
-    uint32_t address = (w2 & 0xffffff);
+    uint32_t address = (w2 & 0x0fffffff);
 
     mp3_task(hle, index, address);
 }

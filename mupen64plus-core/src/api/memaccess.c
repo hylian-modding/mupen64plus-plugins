@@ -7,13 +7,15 @@
 
 #ifdef WIN32
 #define bswap32(x) ((uint32_t)_byteswap_ulong(x))
+#define bswap64(x) ((uint64_t)_byteswap_uint64(x))
 #else
 #define bswap32(x) ((uint32_t)__builtin_bswap32(x))
+#define bswap64(x) ((uint32_t)__builtin_bswap64(x))
 #endif
 
 static inline uint32_t RDRAMAddrAlign(uint32_t addr)
 {
-	return (addr & 0xffffff) >> 2;
+	return (addr & 0x0fffffff) >> 2;
 }
 
 static inline uint32_t ROMAddrAlign(uint32_t addr)
@@ -35,6 +37,12 @@ EXPORT uint16_t CALL ExtRDRAMRead16(uint32_t addr)
 EXPORT uint32_t CALL ExtRDRAMRead32(uint32_t addr)
 {
 	return g_dev.rdram.dram[RDRAMAddrAlign(addr)];
+}
+
+EXPORT uint64_t CALL ExtRDRAMRead64(uint32_t addr)
+{
+	const size_t offset = RDRAMAddrAlign(addr);
+	return *(uint64_t*)(&g_dev.rdram.dram[offset]);
 }
 
 EXPORT uint8_t* CALL ExtRDRAMReadBuffer(uint32_t addr, size_t len)
@@ -62,6 +70,14 @@ EXPORT void CALL ExtRDRAMWrite16(uint32_t addr, uint16_t val)
 EXPORT void CALL ExtRDRAMWrite32(uint32_t addr, uint32_t val)
 {
 	g_dev.rdram.dram[RDRAMAddrAlign(addr)] = val;
+}
+
+EXPORT void CALL ExtRDRAMWrite64(uint32_t addr, uint64_t val)
+{
+	const uint32_t hi = val >> 32;
+	const uint32_t lo = val & 0x00000000FFFFFFFF;
+	g_dev.rdram.dram[RDRAMAddrAlign(addr)] = hi;
+	g_dev.rdram.dram[RDRAMAddrAlign(addr + 4)] = lo;
 }
 
 EXPORT void CALL ExtRDRAMWriteBuffer(uint32_t addr, uint8_t* buf, size_t len)

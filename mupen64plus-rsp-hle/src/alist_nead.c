@@ -54,14 +54,14 @@ static void SPNOOP(struct hle_t* UNUSED(hle), uint32_t UNUSED(w1), uint32_t UNUS
 static void LOADADPCM(struct hle_t* hle, uint32_t w1, uint32_t w2)
 {
     uint16_t count   = w1;
-    uint32_t address = (w2 & 0xffffff);
+    uint32_t address = (w2 & 0x0fffffff);
 
     dram_load_u16(hle, (uint16_t*)hle->alist_nead.table, address, count >> 1);
 }
 
 static void SETLOOP(struct hle_t* hle, uint32_t UNUSED(w1), uint32_t w2)
 {
-    hle->alist_nead.loop = w2 & 0xffffff;
+    hle->alist_nead.loop = w2 & 0x0fffffff;
 }
 
 static void SETBUFF(struct hle_t* hle, uint32_t w1, uint32_t w2)
@@ -74,7 +74,7 @@ static void SETBUFF(struct hle_t* hle, uint32_t w1, uint32_t w2)
 static void ADPCM(struct hle_t* hle, uint32_t w1, uint32_t w2)
 {
     uint8_t  flags   = (w1 >> 16);
-    uint32_t address = (w2 & 0xffffff);
+    uint32_t address = (w2 & 0x0fffffff);
 
     alist_adpcm(
             hle,
@@ -104,7 +104,7 @@ static void LOADBUFF(struct hle_t* hle, uint32_t w1, uint32_t w2)
 {
     uint16_t count   = (w1 >> 12) & 0xfff;
     uint16_t dmem    = (w1 & 0xfff);
-    uint32_t address = (w2 & 0xffffff);
+    uint32_t address = (w2 & 0x0fffffff);
 
     alist_load(hle, dmem, address, count);
 }
@@ -113,7 +113,7 @@ static void SAVEBUFF(struct hle_t* hle, uint32_t w1, uint32_t w2)
 {
     uint16_t count   = (w1 >> 12) & 0xfff;
     uint16_t dmem    = (w1 & 0xfff);
-    uint32_t address = (w2 & 0xffffff);
+    uint32_t address = (w2 & 0x0fffffff);
 
     alist_save(hle, dmem, address, count);
 }
@@ -133,7 +133,7 @@ static void RESAMPLE(struct hle_t* hle, uint32_t w1, uint32_t w2)
 {
     uint8_t  flags   = (w1 >> 16);
     uint16_t pitch   = w1;
-    uint32_t address = (w2 & 0xffffff);
+    uint32_t address = (w2 & 0x0fffffff);
 
     alist_resample(
             hle,
@@ -309,7 +309,7 @@ static void HILOGAIN(struct hle_t* hle, uint32_t w1, uint32_t w2)
 static void FILTER(struct hle_t* hle, uint32_t w1, uint32_t w2)
 {
     uint8_t  flags   = (w1 >> 16);
-    uint32_t address = (w2 & 0xffffff);
+    uint32_t address = (w2 & 0x0fffffff);
 
     if (flags > 1) {
         hle->alist_nead.filter_count          = w1;
@@ -341,7 +341,7 @@ static void POLEF(struct hle_t* hle, uint32_t w1, uint32_t w2)
 {
     uint8_t  flags   = (w1 >> 16);
     uint16_t gain    = w1;
-    uint32_t address = (w2 & 0xffffff);
+    uint32_t address = (w2 & 0x0fffffff);
 
     if (hle->alist_nead.count == 0)
         return;

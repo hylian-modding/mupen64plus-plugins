@@ -409,7 +409,7 @@ static ucode_func_t task_detection(struct hle_t* hle)
         uc_pfunc = try_normal_task_detection(hle);
         if (uc_pfunc)
             return uc_pfunc;
-        
+
         if (type == 1) {
             if (hle->hle_gfx) {
                 return &send_dlist_to_gfx_plugin;
