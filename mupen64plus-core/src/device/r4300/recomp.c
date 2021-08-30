@@ -473,7 +473,7 @@ void dynarec_init_block(struct r4300_core* r4300, uint32_t address)
     length = get_block_length(b);
 
 #ifdef DBG
-//    DebugMessage(M64MSG_INFO, "init block %" PRIX32 " - %" PRIX32, b->start, b->end);
+    DebugMessage(M64MSG_INFO, "init block %" PRIX32 " - %" PRIX32, b->start, b->end);
 #endif
 
     /* allocate block instructions */
@@ -524,7 +524,7 @@ void dynarec_init_block(struct r4300_core* r4300, uint32_t address)
     if (!already_exist)
     {
 #if defined(PROFILE_R4300)
-        r4300->recomp.pfProfile = fopen("instructionaddrs.dat", "ab");
+        r4300->recomp.pfProfile = osal_file_open("instructionaddrs.dat", "ab");
         long x86addr = (long) b->code;
         int mipsop = -2; /* -2 == NOTCOMPILED block at beginning of x86 code */
         if (fwrite(&mipsop, 1, 4, r4300->recomp.pfProfile) != 4 || // write 4-byte MIPS opcode
@@ -641,7 +641,7 @@ void dynarec_recompile_block(struct r4300_core* r4300, const uint32_t* iw, struc
     init_cache(r4300, block->block + (func & 0xFFF) / 4);
 
 #if defined(PROFILE_R4300)
-    r4300->recomp.pfProfile = fopen("instructionaddrs.dat", "ab");
+    r4300->recomp.pfProfile = osal_file_open("instructionaddrs.dat", "ab");
 #endif
 
     for (i = (func & 0xFFF) / 4, finished = 0; finished != 2; ++i)
@@ -746,7 +746,7 @@ void dynarec_recompile_block(struct r4300_core* r4300, const uint32_t* iw, struc
     free_assembler(r4300, &block->jumps_table, &block->jumps_number, &block->riprel_table, &block->riprel_number);
 
 #ifdef DBG
-//    DebugMessage(M64MSG_INFO, "block recompiled (%" PRIX32 "-%" PRIX32 ")", func, block->start+i*4);
+    DebugMessage(M64MSG_INFO, "block recompiled (%" PRIX32 "-%" PRIX32 ")", func, block->start+i*4);
 #endif
 #if defined(PROFILE_R4300)
     fclose(r4300->recomp.pfProfile);
@@ -839,7 +839,7 @@ void profile_write_end_of_code_blocks(struct r4300_core* r4300)
 {
     size_t i;
 
-    r4300->recomp.pfProfile = fopen("instructionaddrs.dat", "ab");
+    r4300->recomp.pfProfile = osal_file_open("instructionaddrs.dat", "ab");
 
     for (i = 0; i < 0x100000; ++i) {
         if (r4300->cached_interp.invalid_code[i] == 0 && r4300->cached_interp.blocks[i] != NULL && r4300->cached_interp.blocks[i]->code != NULL && r4300->cached_interp.blocks[i]->block != NULL)
@@ -891,7 +891,7 @@ void dynarec_setup_code(void)
     /* The dynarec jumps here after we call dyna_start and it prepares
      * Here we need to prepare the initial code block and jump to it
      */
-    dynarec_jump_to(r4300, UINT32_C(0xa4000040));
+    dynarec_jump_to(r4300, r4300->start_address);
 
     /* Prevent segfault on failed dynarec_jump_to */
     if (!r4300->cached_interp.actual->block || !r4300->cached_interp.actual->code) {

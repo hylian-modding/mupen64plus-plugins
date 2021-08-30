@@ -46,7 +46,7 @@ static void do_sp_dma(struct rsp_core* sp, const struct sp_dma* dma)
     unsigned int count = ((l >> 12) & 0xff) + 1;
     unsigned int skip = ((l >> 20) & 0xfff);
 
-    unsigned int memaddr = dma->memaddr & 0xfff;
+    unsigned int memaddr = dma->memaddr & 0xff8;
     unsigned int dramaddr = dma->dramaddr & 0x0fffffff;
 
     unsigned char *spmem = (unsigned char*)sp->mem + (dma->memaddr & 0x1000);
@@ -194,18 +194,12 @@ static void update_sp_status(struct rsp_core* sp, uint32_t w)
     if (w & 0x800000) sp->regs[SP_STATUS_REG] &= ~SP_STATUS_SIG7;
     if (w & 0x1000000) sp->regs[SP_STATUS_REG] |= SP_STATUS_SIG7;
 
-
-    if (sp->rsp_task_locked && (get_event(&sp->mi->r4300->cp0.q, SP_INT))) {
+    if (sp->rsp_task_locked && (get_event(&sp->mi->r4300->cp0.q, SP_INT))) return;
+    if (!(w & 0x1) && !(w & 0x4) && !sp->rsp_task_locked)
         return;
-    }
 
-    if (!(w & 0x1) && !(w & 0x4) && !sp->rsp_task_locked) {
-        return;
-    }
-
-    if (!(sp->regs[SP_STATUS_REG] & (SP_STATUS_HALT | SP_STATUS_BROKE))) {
+    if (!(sp->regs[SP_STATUS_REG] & (SP_STATUS_HALT | SP_STATUS_BROKE)))
         do_SP_Task(sp);
-    }
 }
 
 void init_rsp(struct rsp_core* sp,
@@ -313,6 +307,7 @@ void write_rsp_regs2(void* opaque, uint32_t address, uint32_t value, uint32_t ma
 void do_SP_Task(struct rsp_core* sp)
 {
     uint32_t save_pc = sp->regs2[SP_PC_REG] & ~0xfff;
+
     uint32_t sp_delay_time;
 
     if (sp->mem[0xfc0/4] == 1)

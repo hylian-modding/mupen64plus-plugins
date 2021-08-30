@@ -26,7 +26,6 @@
 #include "device/r4300/cp0.h"
 #include "device/r4300/interrupt.h"
 #include "device/r4300/r4300_core.h"
-#include "api/callbacks.h"
 
 static int update_mi_init_mode(uint32_t* mi_init_mode, uint32_t w)
 {

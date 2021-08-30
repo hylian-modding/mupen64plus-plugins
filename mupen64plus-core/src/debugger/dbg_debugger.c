@@ -51,7 +51,7 @@ void init_debugger()
         DebugMessage(M64MSG_WARNING, "Front-end debugger callbacks are not set, so debugger will remain disabled.");
         return;
     }
-    
+
     g_DebuggerActive = 1;
     g_dbg_runstate = M64P_DBG_RUNSTATE_PAUSED;
 
@@ -70,10 +70,6 @@ void destroy_debugger()
 }
 
 //]=-=-=-=-=-=-=-=-=-=-=-=-=[ Mise-a-Jour Debugger ]=-=-=-=-=-=-=-=-=-=-=-=-=[
-
-#include "api/m64p_ext.h"
-
-extern ExtCallback g_pause_cb;
 
 void update_debugger(uint32_t pc)
 // Update debugger state and display.
@@ -102,10 +98,6 @@ void update_debugger(uint32_t pc)
 #if 0
         SDL_SemWait(sem_pending_steps);
 #endif
-        while (SDL_SemWaitTimeout(sem_pending_steps, 1) != 0) {
-            if (g_pause_cb)
-                g_pause_cb();
-        }
     }
 
     previousPC = pc;

@@ -196,7 +196,6 @@ static m64p_error plugin_connect_gfx(m64p_dynlib_handle plugin_handle)
 
         gfx.AddHiresTexturePath = (ptr_AddHiresTexturePath)osal_dynlib_getproc(plugin_handle, "AddHiresTexturePath");
         gfx.RemoveHiresTexturePath = (ptr_RemoveHiresTexturePath)osal_dynlib_getproc(plugin_handle, "RemoveHiresTexturePath");
-
         if (gfx.AddHiresTexturePath == 0) {
             DebugMessage(M64MSG_ERROR, "Failed to find AddHiresTexturePath\n");
         }
@@ -604,4 +603,3 @@ EXPORT void CALL VidExt_AddHiresTexturePath(char* path) {
 EXPORT void CALL VidExt_RemoveHiresTexturePath(char* path) {
     gfx.RemoveHiresTexturePath(path);
 }
-

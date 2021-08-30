@@ -198,9 +198,7 @@ void init_game_controller(struct game_controller* cont,
     cont->icin = icin;
     cont->pak = pak;
     cont->ipak = ipak;
-
     cont->input = 0;
-    cont->filter = 0;
 }
 
 static void poweron_game_controller(void* jbd)
@@ -220,28 +218,26 @@ static void process_controller_command(void* jbd,
 {
     struct game_controller* cont = (struct game_controller*)jbd;
     BUTTONS input_, cont_input;
-    input_.Value = 0;
-    cont_input.Value = cont->input;
     uint8_t cmd = tx_buf[0];
 
+    input_.Value = 0;
+    cont_input.Value = cont->input;
+
     /* if controller can't successfully be polled, consider it to be absent */
-    if (cont->icin->get_input(cont->cin, &input_.Value) != M64ERR_SUCCESS) {
+    if (cont->icin->get_input(cont->cin, (uint32_t*)&input_) != M64ERR_SUCCESS) {
         *rx |= 0x80;
         return;
     }
 
-    int filter_x_axis = ((cont->filter >> 16) & 0xff) != 0;
-    int filter_y_axis = ((cont->filter >> 24) & 0xff) != 0;
-
+    int32_t x_axis = ((cont->filter >> 16) & 0xff) != 0;
+    int32_t y_axis = ((cont->filter >> 24) & 0xff) != 0;
     input_.Value &= ~cont->filter;
 
-    if (filter_x_axis)
-        input_.X_AXIS = 0;
-    if (filter_y_axis)
-        input_.Y_AXIS = 0;
+    if (x_axis) input_.X_AXIS = 0;
+    if (y_axis) input_.Y_AXIS = 0;
 
-    int x_axis = clamp_s32(input_.X_AXIS + cont_input.X_AXIS, SCHAR_MIN, SCHAR_MAX);
-    int y_axis = clamp_s32(input_.Y_AXIS + cont_input.Y_AXIS, SCHAR_MIN, SCHAR_MAX);
+    x_axis = clamp_s32(input_.X_AXIS + cont_input.X_AXIS, SCHAR_MIN, SCHAR_MAX);
+    y_axis = clamp_s32(input_.Y_AXIS + cont_input.Y_AXIS, SCHAR_MIN, SCHAR_MAX);
 
     input_.Value |= cont->input;
     input_.X_AXIS = x_axis;

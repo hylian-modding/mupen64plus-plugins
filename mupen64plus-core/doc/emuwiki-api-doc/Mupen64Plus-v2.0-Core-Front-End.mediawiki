@@ -106,6 +106,11 @@ Most libmupen64plus functions return an <tt>m64p_error</tt> return code, which i
 |'''<tt>ParamPtr</tt>''' Pointer to a <tt>rom_settings</tt> struct to receive the data.<br />'''<tt>ParamInt</tt>''' The size in bytes of the <tt>rom_settings</tt> struct.
 |A ROM image must be open.
 |-
+|M64CMD_ROM_SET_SETTINGS
+|This will apply the settings data to the currently open ROM until the ROM is closed.
+|'''<tt>ParamPtr</tt>''' Pointer to a <tt>rom_settings</tt> struct to receive the data.<br />'''<tt>ParamInt</tt>''' The size in bytes of the <tt>rom_settings</tt> struct.
+|A ROM image must be open and emulation must not be running.
+|-
 |M64CMD_EXECUTE
 |This command will start the emulator and begin executing the ROM image.  This function call will not return until the game has been stopped.
 |N/A
@@ -192,7 +197,7 @@ Most libmupen64plus functions return an <tt>m64p_error</tt> return code, which i
 |None
 |-
 |M64CMD_NETPLAY_INIT
-|This command will initilize the netplay subsystem. It will also attempt to make an initial connection to the netplay server. Returns M64ERR_SYSTEM_FAIL on failure, M64ERR_SUCCESS on success.
+|This command will initialize the netplay subsystem. It will also attempt to make an initial connection to the netplay server. Returns M64ERR_SYSTEM_FAIL on failure, M64ERR_SUCCESS on success.
 |'''<tt>ParamInt</tt>''' This is the port number the netplay server is listening on.'''<br /><tt>ParamPtr</tt>''' This is a string containing the IP or hostname of the netplay server.
 |Emulator should be stopped.
 |-
@@ -210,6 +215,11 @@ Most libmupen64plus functions return an <tt>m64p_error</tt> return code, which i
 |Closes the netplay subsystem, as well as any connections to the netplay server.
 |N/A
 |None
+|-
+|M64CMD_PIF_OPEN
+|This will cause the core to read in a binary PIF image provided by the front-end.
+|'''<tt>ParamInt</tt>''' must be 2048.'''<br /><tt>ParamPtr</tt>''' Pointer to the uncompressed PIF image in memory.
+|The emulator cannot be currently running.
 |}
 <br />
 
