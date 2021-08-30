@@ -8,7 +8,7 @@
  *   the Free Software Foundation; either version 2 of the License, or     *
  *   (at your option) any later version.                                   *
  *                                                                         *
- *   This program is distributed in the hope that it will be useful,       * 
+ *   This program is distributed in the hope that it will be useful,       *
  *   but WITHOUT ANY WARRANTY; without even the implied warranty of        *
  *   MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the         *
  *   GNU General Public License for more details.                          *
@@ -18,7 +18,7 @@
  *   Free Software Foundation, Inc.,                                       *
  *   51 Franklin Street, Fifth Floor, Boston, MA 02110-1301, USA.          *
  * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
-                       
+
 /* This file contains the Core video extension functions which will be exported
  * outside of the core library.
  */
@@ -106,7 +106,7 @@ EXPORT m64p_error CALL VidExt_Init(void)
 
 #if SDL_VERSION_ATLEAST(2,0,0)
     SDL_SetHint(SDL_HINT_JOYSTICK_ALLOW_BACKGROUND_EVENTS, "1");
-    /* retrieve default swap interval/VSync */ 
+    /* retrieve default swap interval/VSync */
     l_SwapControl = SDL_GL_GetSwapInterval();
 #endif
 
@@ -343,7 +343,7 @@ EXPORT m64p_error CALL VidExt_SetVideoModeWithRate(int Width, int Height, int Re
 #if SDL_VERSION_ATLEAST(2,0,0)
     if (!SDL_WasInit(SDL_INIT_VIDEO) || !SDL_VideoWindow)
         return M64ERR_NOT_INIT;
-    
+
     int videoFlags = 0;
     int display = GetVideoDisplay();
     int modeCount = SDL_GetNumDisplayModes(display);
